@@ -53,13 +53,43 @@ $sql = "
     JOIN 
         materias m ON et.id_Tecnicatura = m.IdTec
     JOIN 
-        finales f ON f.id_estudiante = e.id_estudiante 
-        AND f.id_tecnicatura = m.IdTec AND f.id_materia = m.id_Materia
+        (
+            SELECT 
+                f1.id_estudiante,
+                f1.id_tecnicatura,
+                f1.id_materia,
+                f1.fecha,
+                f1.nota
+            FROM 
+                finales f1
+            JOIN 
+                (
+                SELECT 
+                    id_estudiante, 
+                    id_tecnicatura, 
+                    id_materia, 
+                    MAX(fecha) AS max_fecha
+                FROM 
+                    finales
+                GROUP BY 
+                    id_estudiante, 
+                    id_tecnicatura, 
+                    id_materia
+                ) f2 ON f1.id_estudiante = f2.id_estudiante 
+                AND f1.id_tecnicatura = f2.id_tecnicatura 
+                AND f1.id_materia = f2.id_materia 
+                AND f1.fecha = f2.max_fecha
+        ) f ON f.id_estudiante = e.id_estudiante 
+          AND f.id_tecnicatura = m.IdTec 
+          AND f.id_materia = m.id_Materia
     JOIN
         tecnicaturas t ON t.id_Tecnicatura = et.id_Tecnicatura
     WHERE 
         e.id_estudiante = $id_estudiante AND et.id_Tecnicatura = $id_tecnicatura
+    ORDER BY 
+        m.AnioCursada
 ";
+
 
 // Ejecutar la consulta
 if ($resultado = $mysqli->query($sql)) {
@@ -93,21 +123,43 @@ if ($resultado = $mysqli->query($sql)) {
 }
 
 // Función para convertir la nota a texto
-function convertirNumeroATexto($nota) {
+function convertirNumeroATexto($nota)
+{
     // Array de números para la parte entera
     $numeros = array(
-        'cero', 'uno', 'dos', 'tres', 'cuatro', 'cinco', 
-        'seis', 'siete', 'ocho', 'nueve', 'diez', 'once', 
-        'doce', 'trece', 'catorce', 'quince', 'dieciséis', 
-        'diecisiete', 'dieciocho', 'diecinueve'
+        'cero',
+        'uno',
+        'dos',
+        'tres',
+        'cuatro',
+        'cinco',
+        'seis',
+        'siete',
+        'ocho',
+        'nueve',
+        'diez',
+        'once',
+        'doce',
+        'trece',
+        'catorce',
+        'quince',
+        'dieciséis',
+        'diecisiete',
+        'dieciocho',
+        'diecinueve'
     );
     // Array de decenas
     $decenas = array(
-        2 => 'veinte', 3 => 'treinta', 4 => 'cuarenta', 
-        5 => 'cincuenta', 6 => 'sesenta', 7 => 'setenta', 
-        8 => 'ochenta', 9 => 'noventa'
+        2 => 'veinte',
+        3 => 'treinta',
+        4 => 'cuarenta',
+        5 => 'cincuenta',
+        6 => 'sesenta',
+        7 => 'setenta',
+        8 => 'ochenta',
+        9 => 'noventa'
     );
-    
+
     // Dividimos el número en entero y decimal
     $partes = explode('.', $nota);
     $entero = intval($partes[0]);  // Parte entera
@@ -125,7 +177,7 @@ function convertirNumeroATexto($nota) {
     // Convertimos la parte decimal
     $decena = intval($decimal[0]); // Primer dígito decimal
     $unidad = intval($decimal[1]); // Segundo dígito decimal
-    
+
     if ($decena === 0) {
         // Si es algo como 0X (ej: 01, 02), añadimos "con" + número
         $texto .= ' con ' . $numeros[$unidad];
@@ -157,56 +209,57 @@ function convertirNumeroATexto($nota) {
 </head>
 
 <body>
-<div class="container">
-    <div class="header">
-        <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgEEH2u-pWXkNnvQX6Mg4Hw8iI-aTkz50ywz_AZOxn0NvFfp9ZX_aCt8pFQhd84dQ3pKpw1J4CWvTUPCag5LraitxjS47dEPODzxeN_ehOF6xsmRyq6DDYFIyG32VftRaijhL-diR2P74H3/s1600/logo%252520des.jpg" class="logo">
-        <div class="contenttitle">
-            <p>_____________________________</p>
-            <p><b>DIRECCION DE EDUCACION SUPERIOR <br>
-                INSTITUTO SUPERIOR DE 
-                <br>FORMACION TECNICA N°135</b> </p>
+    <div class="container">
+        <div class="header">
+            <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgEEH2u-pWXkNnvQX6Mg4Hw8iI-aTkz50ywz_AZOxn0NvFfp9ZX_aCt8pFQhd84dQ3pKpw1J4CWvTUPCag5LraitxjS47dEPODzxeN_ehOF6xsmRyq6DDYFIyG32VftRaijhL-diR2P74H3/s1600/logo%252520des.jpg" class="logo">
+            <div class="contenttitle">
+                <p>_____________________________</p>
+                <p><b>DIRECCION DE EDUCACION SUPERIOR <br>
+                        INSTITUTO SUPERIOR DE
+                        <br>FORMACION TECNICA N°135</b> </p>
+            </div>
+            <h2>Certificado De Espacios Acreditados</h2>
         </div>
-        <h2>Certificado De Espacios Acreditados</h2>
-    </div>
-    <div class="content">
-        <h3>ESTABLECIMIENTO: INSTITUTO SUPERIOR DE FORMACIÓN TECNICA Nº 135 (BA)</h3>
-        <p>Conste que <?php echo ($nombre . ' ' . $apellido); ?>, DNI N° <?php echo ($dni); ?> ha aprobado los Espacios curriculares, con las respectivas calificaciones que abajo se registran, correspondientes a la Carrera <strong><?php echo ($tecnicatura); ?></strong>, Resolución Nº <?php echo ($resolucion); ?>.</p>
-    </div>
+        <div class="content">
+            <h3>ESTABLECIMIENTO: INSTITUTO SUPERIOR DE FORMACIÓN TECNICA Nº 135 (BA)</h3>
+            <p>Conste que <?php echo ($nombre . ' ' . $apellido); ?>, DNI N° <?php echo ($dni); ?> ha aprobado los Espacios curriculares, con las respectivas calificaciones que abajo se registran, correspondientes a la Carrera <strong><?php echo ($tecnicatura); ?></strong>, Resolución Nº <?php echo ($resolucion); ?>.</p>
+        </div>
 
-    <div class="datatable">
-        <div class="tabla-contenedor">
-            <table id="tablaDatos" class="display" style="width:100%">
-                <thead>
-                    <tr>
-                        <th>CURSO</th>
-                        <th>ESPACIO CURRICULAR</th>
-                        <th>FECHA DE APROBACIÓN</th>
-                        <th>CALIFICACIÓN En Nros</th>
-                        <th>CALIFICACIÓN En Letras</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php foreach ($resultados as $fila): ?>
+        <div class="datatable">
+            <div class="tabla-contenedor">
+                <table id="tablaDatos" class="display" style="width:100%">
+                    <thead>
                         <tr>
-                            <td><?php echo htmlspecialchars($fila['AnioCurso']); ?></td>
-                            <td><?php echo htmlspecialchars($fila['Materia']); ?></td>
-                            <td><?php echo htmlspecialchars($fila['fecha']); ?></td>
-                            <td><?php echo htmlspecialchars($fila['nota']); ?></td>
-                            <td><?php echo htmlspecialchars($fila['notaTexto']); ?></td>
+                            <th>CURSO</th>
+                            <th>ESPACIO CURRICULAR</th>
+                            <th>FECHA DE APROBACIÓN</th>
+                            <th>CALIFICACIÓN En Nros</th>
+                            <th>CALIFICACIÓN En Letras</th>
                         </tr>
-                    <?php endforeach; ?>
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($resultados as $fila): ?>
+                            <tr>
+                                <td><?php echo htmlspecialchars($fila['AnioCurso']); ?></td>
+                                <td><?php echo htmlspecialchars($fila['Materia']); ?></td>
+                                <td><?php echo htmlspecialchars($fila['fecha']); ?></td>
+                                <td><?php echo htmlspecialchars($fila['nota']); ?></td>
+                                <td><?php echo htmlspecialchars($fila['notaTexto']); ?></td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="signature">
+            <p>.......................................................</p>
+            <p>Firma y sello aclaratorio del Director/a Secretario/a</p>
+        </div>
+        <div class="footer">
+            <p>Sello del establecimiento</p>
         </div>
     </div>
-
-    <div class="signature">
-        <p>.......................................................</p>
-        <p>Firma y sello aclaratorio del Director/a Secretario/a</p>
-    </div>
-    <div class="footer">
-        <p>Sello del establecimiento</p>
-    </div>
-</div>
 </body>
+
 </html>

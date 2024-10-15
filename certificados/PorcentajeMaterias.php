@@ -104,7 +104,7 @@ try {
         // Query para obtener los datos
         $sql = "
         SELECT 
-            CONCAT('Curso ', m.AnioCursada) AS Curso,               
+            m.AnioCursada AS Curso,               
             COUNT(m.id_Materia) AS AsignaturasPlanEstudio,         
             SUM(CASE WHEN f.nota >= 4 THEN 1 ELSE 0 END) AS AsignaturasRendidas,
             (COUNT(m.id_Materia) - SUM(CASE WHEN f.nota >= 4 THEN 1 ELSE 0 END)) AS FaltaRendir
@@ -115,7 +115,7 @@ try {
             AND f.id_estudiante = :id_estudiante
             AND f.id_tecnicatura = $id_tecnicatura
         WHERE 
-            m.IdTec = 1              
+            m.IdTec = $id_tecnicatura            
         GROUP BY 
             m.AnioCursada                                          
         ORDER BY 
