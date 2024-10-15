@@ -1,6 +1,6 @@
 <div id="contenidoPDF"> <!-- Contenedor principal para el PDF -->
     <div class="container">
-        <span class="badge badge-primary" style="font-size: 120%; padding: .5em .75em; margin-top: 20px; display: block;">TS. en Desarrollo de Software - 2024</span>
+        <span id="tecnicatura" class="badge badge-primary" style="font-size: 120%; padding: .5em .75em; margin-top: 20px; display: block;"></span>
 
         <div class="d-flex justify-content-between align-items-center" style="margin-top: 20px; margin-bottom: 20px;">
             <strong>
@@ -26,9 +26,7 @@
     </div>
 
     <div class="container">
-        <strong>
-            <h6>Año De Cursada: (2024)</h6>
-        </strong>
+
         <div class="accordion" id="accordionMaterias">
             <!-- Las tarjetas se generarán aquí por JavaScript -->
         </div>
@@ -58,57 +56,61 @@
     document.addEventListener('DOMContentLoaded', function() {
         // Datos obtenidos de PHP
         <?php
-        $conexion = new mysqli('localhost', 'root', '', 'sitmdm');
-
-        if ($conexion->connect_error) {
-            die("Error de conexión: " . $conexion->connect_error);
-        }
 
         $id_estudiante = getIdEstudiante();
 
-        $sql_tecnicatura = "SELECT id_Tecnicatura FROM estudiantes WHERE id_usuario = ?";
+        $sql_tecnicatura = "SELECT e.id_Tecnicatura, t.nombreTec 
+FROM estudiantes e 
+JOIN tecnicaturas t ON t.id_Tecnicatura = e.id_Tecnicatura
+WHERE id_usuario = ?";
         $stmt_tecnicatura = $conexion->prepare($sql_tecnicatura);
         $stmt_tecnicatura->bind_param("i", $id_estudiante);
         $stmt_tecnicatura->execute();
-        $stmt_tecnicatura->bind_result($id_tecnicatura);
+        $stmt_tecnicatura->bind_result($id_tecnicatura, $nombreTec);
         $stmt_tecnicatura->fetch();
         $stmt_tecnicatura->close();
 
         $sql_materias = "SELECT 
-            m.id_Materia, 
-            m.Materia, 
-            m.AnioCursada, 
-            tm.nota_primer_cuatrimestre, 
-            tm.nota_segundo_cuatrimestre, 
-            tm.asistencia_horas, 
-            tm.horas_cursadas
-            FROM estudiante_materia tm
-            JOIN materias m ON tm.id_Materia = m.id_Materia
-            JOIN estudiante_tecnicatura et ON et.id_estudiante = tm.id_estudiante
-            WHERE tm.id_estudiante = ? AND et.id_Tecnicatura = ?";
+    m.AnioCursada, 
+    m.id_Materia, 
+    m.Materia, 
+    tm.nota_primer_cuatrimestre, 
+    tm.nota_segundo_cuatrimestre, 
+    tm.asistencia_horas, 
+    tm.horas_cursadas
+FROM estudiante_materia tm
+JOIN materias m ON tm.id_Materia = m.id_Materia
+JOIN estudiante_tecnicatura et ON et.id_estudiante = tm.id_estudiante
+WHERE tm.id_estudiante = ? AND et.id_Tecnicatura = ?
+ORDER BY m.AnioCursada ASC";
 
         $stmt = $conexion->prepare($sql_materias);
         $stmt->bind_param("ii", $id_estudiante, $id_tecnicatura);
         $stmt->execute();
         $resultado_materias = $stmt->get_result();
 
-        $datos = array();
+        $datos = array(); // Array para almacenar las materias
 
         if ($resultado_materias->num_rows > 0) {
             while ($row = $resultado_materias->fetch_assoc()) {
-                $datos[$row['id_Materia']] = $row;  
-                $datos[$row['id_Materia']]['finales'] = array();  
+                $row['finales'] = array(); // Inicializa el campo finales
+                $datos[] = $row; // Almacena directamente en el array
             }
         }
 
+        // Ahora ordena $datos por AnioCursada
+        usort($datos, function ($a, $b) {
+            return $a['AnioCursada'] <=> $b['AnioCursada'];
+        });
+
         $stmt->close();
-        
+
         $sql_finales = "SELECT 
-            f.id_materia, 
-            f.fecha, 
-            f.nota 
-            FROM finales f
-            WHERE f.id_estudiante = ? AND f.id_tecnicatura = ?";
+    f.id_materia, 
+    f.fecha, 
+    f.nota 
+FROM finales f
+WHERE f.id_estudiante = ? AND f.id_tecnicatura = ?";
 
         $stmt_finales = $conexion->prepare($sql_finales);
         $stmt_finales->bind_param("ii", $id_estudiante, $id_tecnicatura);
@@ -117,10 +119,16 @@
 
         if ($resultado_finales->num_rows > 0) {
             while ($row_finales = $resultado_finales->fetch_assoc()) {
-                $datos[$row_finales['id_materia']]['finales'][] = array(
-                    "fecha" => $row_finales['fecha'],
-                    "nota" => $row_finales['nota']
-                );
+                // Busca la materia correspondiente en el array $datos
+                foreach ($datos as &$materia) {
+                    if ($materia['id_Materia'] == $row_finales['id_materia']) {
+                        $materia['finales'][] = array(
+                            "fecha" => $row_finales['fecha'],
+                            "nota" => $row_finales['nota']
+                        );
+                        break; // Salir del bucle una vez que se ha encontrado la materia
+                    }
+                }
             }
         }
 
@@ -128,9 +136,15 @@
         $conexion->close();
 
         echo "const materias = " . json_encode($datos) . ";";
+        echo "const nombreTec = " . json_encode($nombreTec) . ";";
         ?>
 
+
+        const tituloTec = document.getElementById('tecnicatura');
+        tituloTec.innerHTML = nombreTec;
+
         console.log('Datos de materias:', materias);
+        console.log('Datos de materias:', nombreTec);
 
         function calcularPromedio(notas) {
             if (notas.length === 0) return 0;
@@ -171,11 +185,12 @@
                 });
 
                 return `
+               
                     <div class="card mb-3">
                         <div class="card-header" id="heading${cardId}">
                             <h5 class="mb-0">
                                 <button class="btn btn-link toggle-card" type="button" data-toggle="collapse" data-target="#collapse${cardId}" aria-expanded="false" aria-controls="collapse${cardId}">
-                                    ${materiaData.Materia}
+                                    ${materiaData.Materia} - año: ${materiaData.AnioCursada}
                                 </button>
                             </h5>
                         </div>

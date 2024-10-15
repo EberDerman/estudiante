@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 15-10-2024 a las 02:47:48
+-- Tiempo de generación: 15-10-2024 a las 16:16:00
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -340,7 +340,7 @@ INSERT INTO `finales` (`id_final`, `id_estudiante`, `id_tecnicatura`, `id_materi
 (7, 7, 1, 5, '2024-06-07', 9.50),
 (8, 8, 2, 1, '2024-06-08', 5.00),
 (9, 9, 1, 3, '2024-06-09', 8.75),
-(10, 10, 3, 2, '2024-06-10', 6.00);
+(10, 1, 1, 1, '2024-06-25', 6.00);
 
 -- --------------------------------------------------------
 
