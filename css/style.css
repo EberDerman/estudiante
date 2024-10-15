@@ -1,0 +1,178 @@
+/* Your custom styles */
+.md-form {
+    font-weight: 300;
+}
+
+.nav-link-form.active {
+    background-color: #54A3E8 !important;
+}
+
+.nav-link-form {
+    background-color: #54B7E8 !important;
+    border-bottom-right-radius: 0rem !important;
+    border-bottom-left-radius: 0rem !important;
+}
+
+.text-muted {
+    color: #777;
+}
+
+.btn-custom {
+    box-shadow: 0 2px 5px 0 rgba(0,0,0,.16), 0 2px 10px 0 rgba(0,0,0,.12);
+    transition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out, -webkit-box-shadow .15s ease-in-out;
+    padding: .375rem .75rem;
+    font-size: 1rem;
+    line-height: 1.5;
+    text-align: center;
+    white-space: nowrap !important;
+}
+
+.btn-sm-custom {
+    padding: .5rem 1.6rem;
+}
+
+#modalFormRubro {
+    top: initial;
+}
+
+.lbl-custom {
+    color: #757575;    
+}
+
+.pointer {
+    cursor: pointer;
+}
+
+.cursor-default {
+    cursor: default !important;
+}
+
+.cursor-inherit {
+    cursor: inherit !important;
+}
+
+.cursor-text {
+    cursor: text !important;
+}
+
+.cursor-wait {
+    cursor: wait !important;
+}
+
+.bg-window {
+    background-color: aliceblue;
+}
+
+.btnAgregar {
+    background-color: limegreen !important;
+    color: #fff !important;
+}
+
+.btnAgregar:hover {
+    background-color: #09c409 !important;
+    color: #fff !important;
+}
+
+#fotoArticulo {
+    width: 250px;
+    height: 250px;
+    background-color: #CCE7FF;
+}
+
+.w-30 {
+    width: 30%;
+}
+
+.input-table {
+    border: none !important;
+    background: none;
+    height: auto;
+    width: auto;
+    text-align: center;
+    font-weight: inherit;
+    color: inherit;
+    padding: 0%;
+}
+
+.mdb-select.text-center input {
+    text-align: center;
+}
+
+.align-center {
+    margin-top: auto;
+    margin-bottom: auto;
+}
+
+.hoverTable tbody tr:hover {
+    background-color: #c2e9f7;
+}
+
+.form-control-custom {
+    color: #495057;
+    background-color: #fff;
+    border: 1px solid #ced4da;
+    font-size: 12px;
+}
+
+.ico-pantallacompleta {
+    background: url('../img/svg/pantalla-completa.svg');
+    height: 20px;
+    width: 20px;
+    display: block;
+}
+
+.ico-salirpantallacompleta {
+    background: url('../img/svg/salir_pantalla_completa.svg');
+    height: 20px;
+    width: 20px;
+    display: block;
+}
+
+.bg-select-table {
+    background-color: #c2e9f7 !important;
+}
+
+.bg-green {
+    background-color: #eafaf1; 
+}
+
+.bg-green-1 {
+    background-color: #abebc6;
+}
+
+.green-gradient {
+    background: rgba(153,217,128,1);
+    background: -moz-linear-gradient(top, rgba(153,217,128,1) 0%, rgba(5,145,61,1) 100%);
+    background: -webkit-gradient(left top, left bottom, color-stop(0%, rgba(153,217,128,1)), color-stop(100%, rgba(5,145,61,1)));
+    background: -webkit-linear-gradient(top, rgba(153,217,128,1) 0%, rgba(5,145,61,1) 100%);
+}
+
+.font-14 {
+    font-size: 14px;
+}
+
+.center-label {
+    left: 50% !important;    
+}
+
+.tableSmall td {
+    padding: 0 !important;
+}
+
+/* Additional styles */
+body {
+    background-color: #f8f9fa;
+}
+
+.card {
+    border-radius: 20px;
+}
+
+table th, table td {
+    text-align: center;
+    vertical-align: middle;
+}
+
+button {
+    border-radius: 5px;
+}

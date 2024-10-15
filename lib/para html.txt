@@ -1,0 +1,33 @@
+require_once 'lib/pdf/autoload.inc.php';
+	ob_start();
+
+
+y al pie
+
+<?php
+  //buffering of html code
+  $output = ob_get_clean();
+
+  // reference the Dompdf namespace
+  use Dompdf\Dompdf;
+
+  // instantiate and use the dompdf class
+  $dompdf = new Dompdf();
+  $dompdf->loadHtml($output);
+
+  // (Optional) Setup the paper size and orientation
+  $dompdf->setPaper('A4', 'portrait');
+
+  // Render the HTML as PDF
+  $dompdf->render();
+
+  // Output the generated PDF to Browser
+  $filename = "PDFcedulaPH-2.pdf";
+  $dompdf->stream($filename, array("Attachment" => 0));
+?>
+
+
+
+
+
+
