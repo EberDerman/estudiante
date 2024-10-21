@@ -1,6 +1,6 @@
 <?php
 include("../administrativo/sesion.php");
-requireAuthEst();
+checkAccessEstudiante([1, 6]);
 // archivo solicitar_certificado.php
 include("../administrativo/sql/conexion.php"); // Incluye el archivo de conexión
 

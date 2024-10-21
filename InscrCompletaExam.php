@@ -1,7 +1,7 @@
 <?php
 // Iniciar la sesión
 include("../administrativo/sesion.php");
-requireAuthEst();
+checkAccessEstudiante([1, 6]);
 include("../administrativo/sql/conexion.php");
 
 // Verificar si los datos están disponibles en la sesión

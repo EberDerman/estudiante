@@ -1,7 +1,7 @@
 <?php
 // Iniciar la sesión
 include("../administrativo/sesion.php");
-requireAuthEst();
+checkAccessEstudiante([1, 6]);
 
 // Verificar si se ha definido la constante
 if (!defined('ACCESO_PERMITIDO')) {

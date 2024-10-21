@@ -1,6 +1,6 @@
 <?php
 include("../administrativo/sesion.php");
-requireAuthEst();
+checkAccessEstudiante([1, 6]);
 include("encabezado.php");
 include("../administrativo/sql/conexion.php"); 
 
