@@ -1,4 +1,10 @@
-
+<?php
+// Verificar si se ha definido la constante
+if (!defined('ACCESO_PERMITIDO')) {
+    header("Location: ../administrativo/index.php");
+    exit();
+}
+?>
 
 <!DOCTYPE html>
 <header>
@@ -40,7 +46,7 @@
       <li class="nav-item dropdown">
         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown"
           aria-haspopup="true" aria-expanded="false"><i class="fas fa-user"></i>
-          <?php echo $_SESSION['username']; ?>
+          <?php echo $_SESSION['usuario']; ?>
         </a>
         <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownMenuLink">
           <a class="dropdown-item" href="logout.php"><i class="fa fa-fw fa-power-off"></i>Logout</a>

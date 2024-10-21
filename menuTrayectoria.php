@@ -1,8 +1,9 @@
 <?php
-include("sesion.php");
-requireAuth();
+include("../administrativo/sesion.php");
+requireAuthEst();
+
 include("encabezado.php");
-include("sql/conexion.php");
+include("../administrativo/sql/conexion.php");
 ?>
 
 <!DOCTYPE html>
@@ -16,31 +17,32 @@ include("sql/conexion.php");
     <div class="container-fluid">
       <?php
 
-            include ("menuEstudiante.php");
+      include("menuEstudiante.php");
 
-        ?>
-      </div>
-      <?php
-
-include ("trayectoria.php");
-
-?>
-    </main>
-    <!-- Main layout -->
-
+      ?>
+    </div>
     <?php
-    include("pie.php");
+
+    include("trayectoria.php");
+
+
     ?>
-    <!-- Footer -->
+  </main>
+  <!-- Main layout -->
 
-    <!-- SCRIPTS -->
+  <?php
+  include("pie.php");
+  ?>
+  <!-- Footer -->
+
+  <!-- SCRIPTS -->
 
 
-    <!-- Initializations -->
-    
-<script src="js/inicializacionSidear.js"></script>
-<script src="js/charts.js"></script>
+  <!-- Initializations -->
 
-    </body>
+  <script src="js/inicializacionSidear.js"></script>
+  <script src="js/charts.js"></script>
 
-    </html>
+</body>
+
+</html>

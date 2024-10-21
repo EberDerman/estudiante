@@ -1,4 +1,10 @@
-
+<?php
+// Verificar si se ha definido la constante
+if (!defined('ACCESO_PERMITIDO')) {
+    header("Location: ../administrativo/index.php");
+    exit();
+}
+?>
 <!DOCTYPE html>
 
 <head>

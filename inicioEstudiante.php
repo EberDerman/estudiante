@@ -1,8 +1,8 @@
 <?php
-include("sesion.php");
-requireAuth();
+include("../administrativo/sesion.php");
+requireAuthEst();
 include("encabezado.php");
-include("sql/conexion.php");
+include("../administrativo/sql/conexion.php");
 ?>
 <!DOCTYPE html>
 <html lang="es">

@@ -1,6 +1,13 @@
-<div id="contenidoPDF"> <!-- Contenedor principal para el PDF -->
+<?php
+// Verificar si se ha definido la constante
+if (!defined('ACCESO_PERMITIDO')) {
+    header("Location: ../administrativo/index.php");
+    exit();
+}
+?>
+<div id="contenidoPDF" style="height: 120vh;"> <!-- Contenedor principal para el PDF editado-->
     <div class="container">
-        <span id="tecnicatura" class="badge badge-primary" style="font-size: 120%; padding: .5em .75em; margin-top: 20px; display: block;"></span>
+        <span class="badge badge-primary" id="tituloTec" style="font-size: 120%; padding: .5em .75em; margin-top: 20px; display: block;"></span>
 
         <div class="d-flex justify-content-between align-items-center" style="margin-top: 20px; margin-bottom: 20px;">
             <strong>
@@ -26,7 +33,9 @@
     </div>
 
     <div class="container">
-
+        <strong>
+            <h6>Año De Cursada: (2024)</h6>
+        </strong>
         <div class="accordion" id="accordionMaterias">
             <!-- Las tarjetas se generarán aquí por JavaScript -->
         </div>
@@ -57,60 +66,68 @@
         // Datos obtenidos de PHP
         <?php
 
-        $id_estudiante = getIdEstudiante();
 
-        $sql_tecnicatura = "SELECT e.id_Tecnicatura, t.nombreTec 
-FROM estudiantes e 
-JOIN tecnicaturas t ON t.id_Tecnicatura = e.id_Tecnicatura
-WHERE id_usuario = ?";
-        $stmt_tecnicatura = $conexion->prepare($sql_tecnicatura);
-        $stmt_tecnicatura->bind_param("i", $id_estudiante);
-        $stmt_tecnicatura->execute();
-        $stmt_tecnicatura->bind_result($id_tecnicatura, $nombreTec);
-        $stmt_tecnicatura->fetch();
-        $stmt_tecnicatura->close();
+        $id_usuario = getIdUsuario();
+        $id_tecnicatura = getIdTecnicatura();
 
-        $sql_materias = "SELECT 
-    m.AnioCursada, 
-    m.id_Materia, 
-    m.Materia, 
-    tm.nota_primer_cuatrimestre, 
-    tm.nota_segundo_cuatrimestre, 
-    tm.asistencia_horas, 
-    tm.horas_cursadas
-FROM estudiante_materia tm
-JOIN materias m ON tm.id_Materia = m.id_Materia
-JOIN estudiante_tecnicatura et ON et.id_estudiante = tm.id_estudiante
-WHERE tm.id_estudiante = ? AND et.id_Tecnicatura = ?
-ORDER BY m.AnioCursada ASC";
+        $sql_estudiante = "SELECT id_estudiante FROM estudiantes WHERE idUsuario = ?";
+        $stmt_estudiante = $conexion->prepare($sql_estudiante);
+        $stmt_estudiante->bind_param("i", $id_usuario);
+        $stmt_estudiante->execute();
+        $stmt_estudiante->bind_result($id_estudiante);
+        $stmt_estudiante->fetch();
+        $stmt_estudiante->close();
+
+
+
+        $sql_tecnicatura = "SELECT t.nombreTec 
+        FROM tecnicaturas t 
+                WHERE id_Tecnicatura = ?";
+                $stmt_tecnicatura = $conexion->prepare($sql_tecnicatura);
+                $stmt_tecnicatura->bind_param("i", $id_tecnicatura);
+                $stmt_tecnicatura->execute();
+                $stmt_tecnicatura->bind_result($nombreTec);
+                $stmt_tecnicatura->fetch();
+                $stmt_tecnicatura->close();
+
+                $sql_materias = "SELECT 
+                m.AnioCursada, 
+                m.id_Materia, 
+                m.Materia, 
+                tm.nota_primer_cuatrimestre, 
+                tm.nota_segundo_cuatrimestre, 
+                tm.asistencia_horas, 
+                tm.horas_cursadas
+            FROM estudiante_materia tm
+            LEFT JOIN materias m ON tm.id_Materia = m.id_Materia
+            LEFT JOIN fechas_materias fm ON fm.id_Materia = m.id_Materia AND fm.id_Tecnicatura = ?
+            LEFT JOIN estudiante_tecnicatura et ON et.id_estudiante = tm.id_estudiante
+            WHERE tm.id_estudiante = ? 
+            ORDER BY m.AnioCursada ASC";
+
 
         $stmt = $conexion->prepare($sql_materias);
         $stmt->bind_param("ii", $id_estudiante, $id_tecnicatura);
         $stmt->execute();
         $resultado_materias = $stmt->get_result();
 
-        $datos = array(); // Array para almacenar las materias
+        $datos = array();
 
         if ($resultado_materias->num_rows > 0) {
             while ($row = $resultado_materias->fetch_assoc()) {
-                $row['finales'] = array(); // Inicializa el campo finales
-                $datos[] = $row; // Almacena directamente en el array
+                $datos[$row['id_Materia']] = $row;
+                $datos[$row['id_Materia']]['finales'] = array();
             }
         }
-
-        // Ahora ordena $datos por AnioCursada
-        usort($datos, function ($a, $b) {
-            return $a['AnioCursada'] <=> $b['AnioCursada'];
-        });
 
         $stmt->close();
 
         $sql_finales = "SELECT 
-    f.id_materia, 
-    f.fecha, 
-    f.nota 
-FROM finales f
-WHERE f.id_estudiante = ? AND f.id_tecnicatura = ?";
+            f.id_materia, 
+            f.fecha, 
+            f.nota 
+            FROM finales f
+            WHERE f.id_estudiante = ? AND f.id_tecnicatura = ?";
 
         $stmt_finales = $conexion->prepare($sql_finales);
         $stmt_finales->bind_param("ii", $id_estudiante, $id_tecnicatura);
@@ -119,18 +136,13 @@ WHERE f.id_estudiante = ? AND f.id_tecnicatura = ?";
 
         if ($resultado_finales->num_rows > 0) {
             while ($row_finales = $resultado_finales->fetch_assoc()) {
-                // Busca la materia correspondiente en el array $datos
-                foreach ($datos as &$materia) {
-                    if ($materia['id_Materia'] == $row_finales['id_materia']) {
-                        $materia['finales'][] = array(
-                            "fecha" => $row_finales['fecha'],
-                            "nota" => $row_finales['nota']
-                        );
-                        break; // Salir del bucle una vez que se ha encontrado la materia
-                    }
-                }
+                $datos[$row_finales['id_materia']]['finales'][] = array(
+                    "fecha" => $row_finales['fecha'],
+                    "nota" => $row_finales['nota']
+                );
             }
         }
+     
 
         $stmt_finales->close();
         $conexion->close();
@@ -139,12 +151,10 @@ WHERE f.id_estudiante = ? AND f.id_tecnicatura = ?";
         echo "const nombreTec = " . json_encode($nombreTec) . ";";
         ?>
 
-
-        const tituloTec = document.getElementById('tecnicatura');
-        tituloTec.innerHTML = nombreTec;
-
         console.log('Datos de materias:', materias);
-        console.log('Datos de materias:', nombreTec);
+      
+        const tituloTec = document.getElementById('tituloTec');
+        tituloTec.innerHTML = nombreTec;
 
         function calcularPromedio(notas) {
             if (notas.length === 0) return 0;
@@ -185,12 +195,11 @@ WHERE f.id_estudiante = ? AND f.id_tecnicatura = ?";
                 });
 
                 return `
-               
                     <div class="card mb-3">
                         <div class="card-header" id="heading${cardId}">
                             <h5 class="mb-0">
                                 <button class="btn btn-link toggle-card" type="button" data-toggle="collapse" data-target="#collapse${cardId}" aria-expanded="false" aria-controls="collapse${cardId}">
-                                    ${materiaData.Materia} - año: ${materiaData.AnioCursada}
+                                    ${materiaData.Materia}
                                 </button>
                             </h5>
                         </div>

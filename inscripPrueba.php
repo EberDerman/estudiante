@@ -1,8 +1,8 @@
 <?php
-include("sesion.php");
-requireAuth();
+include("../administrativo/sesion.php");
+requireAuthEst();
 include("encabezado.php");
-include("sql/conexion.php");
+include("../administrativo/sql/conexion.php");
 include("menuEstudiante.php");
 ?>
 
@@ -58,19 +58,17 @@ include("menuEstudiante.php");
       // Datos obtenidos de PHP
       <?php
 
+      $id_usuario = getIdUsuario();
+      $id_tecnicatura = getIdTecnicatura();
 
+      $sql_estudiante = "SELECT id_estudiante FROM estudiantes WHERE idUsuario = ?";
+      $stmt_estudiante = $conexion->prepare($sql_estudiante);
+      $stmt_estudiante->bind_param("i", $id_usuario);
+      $stmt_estudiante->execute();
+      $stmt_estudiante->bind_result($id_estudiante);
+      $stmt_estudiante->fetch();
+      $stmt_estudiante->close();
 
-      // ID del estudiante para el cual se desea obtener las materias
-      $id_estudiante = getIdEstudiante();
-
-      // Consulta SQL para obtener id_Tecnicatura
-      $sql_tecnicatura = "SELECT id_Tecnicatura FROM estudiantes WHERE id_usuario = ?";
-      $stmt_tecnicatura = $conexion->prepare($sql_tecnicatura);
-      $stmt_tecnicatura->bind_param("i", $id_estudiante);
-      $stmt_tecnicatura->execute();
-      $stmt_tecnicatura->bind_result($id_tecnicatura);
-      $stmt_tecnicatura->fetch();
-      $stmt_tecnicatura->close();
 
       // Consulta SQL para filtrar por el ID del estudiante
       $sql = "SELECT m.id_Materia, m.Materia, m.AnioCursada, 

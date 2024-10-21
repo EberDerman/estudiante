@@ -1,5 +1,14 @@
+
+<?php
+// Verificar si se ha definido la constante
+if (!defined('ACCESO_PERMITIDO')) {
+    header("Location: ../administrativo/index.php");
+    exit();
+}
+?>
+
 <!--Footer-->
-<footer class="page-footer pt-0 mt-5">
+<footer class="page-footer pt-0 mt-5 text-center  position-fixed w-100">
   <!--Copyright-->
   <div class="footer-copyright py-3 text-center">
     <div class="container-fluid">

@@ -1,6 +1,8 @@
 <?php
+include("../administrativo/sesion.php");
+requireAuthEst();
 // archivo solicitar_certificado.php
-include("sql/conexion.php"); // Incluye el archivo de conexión
+include("../administrativo/sql/conexion.php"); // Incluye el archivo de conexión
 
 // Recoger datos del request 
 $tipoCertificado = $_POST['tipoCertificado'];

@@ -1,6 +1,14 @@
 <?php
 // Iniciar la sesión
-session_start();
+include("../administrativo/sesion.php");
+requireAuthEst();
+
+// Verificar si se ha definido la constante
+if (!defined('ACCESO_PERMITIDO')) {
+    header("Location: ../administrativo/index.php");
+    exit();
+}
+
 
 // Obtener los datos enviados por la solicitud POST
 $materia = isset($_POST['materia']) ? $_POST['materia'] : '';

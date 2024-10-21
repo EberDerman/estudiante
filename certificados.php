@@ -1,11 +1,21 @@
 <?php
-include("sesion.php");
-requireAuth();
+include("../administrativo/sesion.php");
+requireAuthEst();
 include("encabezado.php");
-include("sql/conexion.php"); 
+include("../administrativo/sql/conexion.php"); 
 
 
-$id_estudiante = getIdEstudiante();
+    
+$id_usuario = getIdUsuario();
+
+$sql_estudiante = "SELECT id_estudiante FROM estudiantes WHERE idUsuario = ?";
+$stmt_estudiante = $conexion->prepare($sql_estudiante);
+$stmt_estudiante->bind_param("i", $id_usuario);
+$stmt_estudiante->execute();
+$stmt_estudiante->bind_result($id_estudiante);
+$stmt_estudiante->fetch();
+$stmt_estudiante->close();
+
 
 try {
     $stmt = $conexiones->prepare("SELECT c.FechaSolicitud, c.TipoCertificado, e.estado 

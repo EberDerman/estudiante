@@ -1,7 +1,8 @@
 <?php
 // Iniciar la sesión
-include("sesion.php");
-requireAuth();
+include("../administrativo/sesion.php");
+requireAuthEst();
+include("../administrativo/sql/conexion.php");
 
 // Verificar si los datos están disponibles en la sesión
 if (isset($_SESSION['username'])) {
